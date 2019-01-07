@@ -25,17 +25,26 @@ class OpenglConan(ConanFile):
         config_scheme(self)
 
     def source(self):
-        url_ = "https://github.com/CentricularK/OpenGL-Registry.git"
+        tools.mkdir(self._source_subfolder)
         branch_ = "master"
-        git = tools.Git(folder="OpenGL-Registry")
-        git.clone(url_, branch=branch_)
-        os.rename("OpenGL-Registry", self._source_subfolder)
+        with tools.chdir(self._source_subfolder):
+            opengl_url_ = "https://github.com/CentricularK/OpenGL-Registry.git"
+            git = tools.Git(folder="OpenGL-Registry")
+            git.clone(opengl_url_, branch=branch_)
+            
+            #os.rename("OpenGL-Registry", self._source_subfolder)
+            egl_url_ = "https://github.com/KhronosGroup/EGL-Registry.git"
+            egl_git = tools.Git(folder="EGL-Registry")
+            egl_git.clone(egl_url_, branch=branch_)
+            
+            #os.rename("EGL-Registry", self._source_subfolder)
 
     def build(self):
         pass
-    
+
     def package(self):
-        self.copy("*", dst=os.path.join(self.package_folder,"include","GL"), src=os.path.join(self.build_folder,self._source_subfolder, "api","GL"))
+        self.copy("*", dst=os.path.join(self.package_folder,"include","GL"), src=os.path.join(self.build_folder,self._source_subfolder,"OpenGL-Registry", "api","GL"))
+        self.copy("*", dst=os.path.join(self.package_folder,"include","KHR"), src=os.path.join(self.build_folder,self._source_subfolder,"EGL-Registry", "api","KHR"))
 
     def package_info(self):
         self.cpp_info.libs = tools.collect_libs(self)
